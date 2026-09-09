@@ -1,0 +1,5 @@
+# Python dependencies for auv-backend/
+# Update this to match the actual packages used in auv-backend/requirements.txt or its equivalent
+fastapi
+uvicorn
+numpy
