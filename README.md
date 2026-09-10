@@ -35,6 +35,7 @@ The selected waveform is synthesized digitally by the ESP32. During the 5 ms TX 
 The waveform then passes through mode-dependent digital windowing:
 1. Blackman window for LFM chirps and geometric sweeps to control sidelobes and reduce spectral leakage
 2. Rectangular/light Tukey window for Barker-13 phase-coded pulses, where preserving the individual phase-coded chips is important.
+
 Once the waveform is prepared, the ESP32 arms a hardware timer and DMA transfer. The DMA autonomously transfers the 100 samples from RAM to the DAC at a 200 kHz sample rate, corresponding to a 5 μs Zero-Order Hold (ZOH) interval. This allows the CPU to immediately enter Light Sleep instead of continuously driving the DAC in software.
 When the DMA transfer finishes, a hardware interrupt wakes the CPU briefly. The CPU shuts down the DAC to prevent unnecessary static power consumption and then returns to sleep during the remaining LISTEN period.
 This creates a time-shared TX/LISTEN cycle, allowing the same transducer path to be used for transmission and reception without simultaneous TX/RX conflict.
