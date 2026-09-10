@@ -171,16 +171,17 @@ sih-2026/
 ```
 
 ## 8. Final Presentation
-[submission/PRESENTATION.md](submission/PRESENTATION.md)
+
+[View the Final Presentation](submission/PRESENTATION.md)
 
 ## 9. Demo Video
-[submission/DEMO.md](submission/DEMO.md)
+
+[View the Prototype Demo](submission/DEMO.md)
 
 ## 10. Screenshots / Prototype Photos
 
-Simulink model screenshots, scope captures, and hardware/prototype photos to: `assets/screenshots/`
-
-See [assets/screenshots/README.md](assets/screenshots/README.md) for naming conventions.
+Simulink model screenshots, waveform captures, decision-logic results and analog front-end/prototype images are available in: `assets/screenshots/`
+[assets/screenshots/README.md](assets/screenshots/README.md) 
 
 ## 11. Installation
 
