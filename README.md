@@ -153,27 +153,22 @@ sih-2026/
 │   └── architecture.md
 ├── assets/
 │   └── screenshots/
-│       ├── before-dac-result.png    # Team A simulation result screenshot
-│       ├── after-dac-result.png     # Team B simulation result screenshot
+        ├── after_dac_schematic.jpeg
+│       ├── after_dac_waveform.jpeg
+│       ├── before_dac_full_pipeline.png
+│       ├── decision_logic.jpeg
+│       ├── mod_select_decision.jpeg
+│       ├── modulation_selector.jpeg
+│       ├── mode0_lfm_final.jpeg
+│       ├── mode0_lfm_raw.jpeg
+│       ├── mode1_geometricalsweep_final.jpeg
+│       ├── mode1_geometricalsweep_raw.jpeg
+│       ├── mode2_phasecoded_final.jpeg
+│       └── mode2_phasecoded_raw.jpeg
 │       └── README.md
 ├── .gitignore
 └── LICENSE
 ```
-
-### What goes where?
-
-| Item                                          | Location                                |
-| ------------------------------------------------ | ------------------------------------------ |
-| Simulink model - before DAC (Team A)            | `src/simulink/before_dac_model.slx`         |
-| Simulink/Simscape model - after DAC (Team B)    | `src/simulink/after_dac_model.slx`          |
-| ESP32 firmware                                  | `src/esp32-firmware/`                       |
-| Backend code                                    | `auv-backend/`                              |
-| Frontend / dashboard code                       | `sih_tech_frontend/`                        |
-| Architecture / technical documentation          | `docs/`                                     |
-| Screenshots of both models' results             | `assets/screenshots/`                       |
-| Final PPT link                                  | `submission/PRESENTATION.md`                |
-| Prototype demo video link                       | `submission/DEMO.md`                        |
-| Project overview                                | `README.md`                                 |
 
 ## 8. Final Presentation
 [submission/PRESENTATION.md](submission/PRESENTATION.md)
