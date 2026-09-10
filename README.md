@@ -19,6 +19,7 @@ We propose a **Software-Defined Sonar (SDS)** transmitter that adapts its wavefo
 The system continuously reads **turbidity**, **depth**, and **temperature** via ADC channels (mapped from potentiometer inputs at the current prototype stage) and uses this data to dynamically determine the most suitable suitable transmission configuration and parameters.
 
 **ADAPTIVE WAVEFORM AND PARAMETER SELECTION**
+
 - **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band — turbidity limits the base frequency band to prevent signal scattering
 - **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band — depth dictates total pulse duration for deeper energy penetration
 - **Modulation type** — automatically decided by the Mod_Select Decision Block, not manually selected:
@@ -29,6 +30,7 @@ The system continuously reads **turbidity**, **depth**, and **temperature** via 
 - Bandwidth — dynamically compensated to maintain a target 2 cm range resolution (dR_target) across the operating frequency bands, eliminating the need for manual reconfiguration even at the 100 kHz operating point.
 
 **DIGITAL WAVEFORM GENERATION AND LOW POWER TRANSMISSION**
+
 The selected waveform is synthesized digitally by the ESP32. During the 5 ms TX window, the CPU computes a 100-sample waveform array corresponding to the required modulation, frequency, bandwidth and pulse duration.
 The waveform then passes through mode-dependent digital windowing:
 1. Blackman window for LFM chirps and geometric sweeps to control sidelobes and reduce spectral leakage
@@ -38,6 +40,7 @@ When the DMA transfer finishes, a hardware interrupt wakes the CPU briefly. The 
 This creates a time-shared TX/LISTEN cycle, allowing the same transducer path to be used for transmission and reception without simultaneous TX/RX conflict.
 
 **ANALOG SIGNAL CONDITIONING AND POWER DELIVERY**
+
 After digital synthesis and DAC conversion, the waveform becomes a low-voltage (~3.3 V) analog signal. This signal is then processed by analog front end to clean, amplify, and efficiently couple it to the piezoelectric sonar transducer.
 Analog chain: 
 1. Signal Routing — CD4051 Analog MUX
