@@ -6,7 +6,7 @@ Upload the **final SIH presentation (PPT/PPTX)** in this `submission/` folder an
 
 Replace the placeholder below with the actual file name once uploaded:
 
-- **PPT:** `[Open Final Presentation](./SIH2025-IDEA-Presentation-Format.pptx)`
+- **PPT:** `[Open Final Presentation](./SIH2026_PROJECT_POSEIDON.pptx)`
 
 ### Requirements
 
