@@ -2,11 +2,11 @@
 
 Upload the **final SIH presentation (PPT/PPTX)** in this `submission/` folder and keep it with the project repository.
 
-## Presentation file
+# Project Presentation
 
-Replace the placeholder below with the actual file name once uploaded:
+## Presentation File
 
-- **PPT:** `[Open Final Presentation]([https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8)`
+[Open Final Presentation](https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8)
 
 ### Requirements
 
