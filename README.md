@@ -184,14 +184,18 @@ Simulink model screenshots, waveform captures, decision-logic results and analog
 
 ## 11. Installation
 
+Clone the repository and install the required dependencies:
 ```
-git clone <YOUR_REPOSITORY_URL>
+bash
+git clone https://github.com/Bharat2310/sih-2026.git
 cd sih-2026
-pip install -r requirements.txt
+
 ```
 
-MATLAB/Simulink models require **MATLAB R2026a** with the **DSP System Toolbox** installed. Open `src/` and load the `.slx` model directly in Simulink.
-LTSpice 
+Prerequisites
+1. MATLAB R2026a with Simulink and DSP System Toolbox
+2. LTspice
+3. Arduino IDE or PlatformIO for ESP32 firmware
 
 ## 12. Run
 
