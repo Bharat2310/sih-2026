@@ -67,7 +67,7 @@ This completes the transmitter-side signal chain, with the transducer converting
 - **Temperature-Based Correction:** Continuously calculates acoustic velocity for accurate bandwidth control.
 - **Dual-Stage Signal Conditioning:** Combines digital windowing with dedicated analog filtering to reduce sidelobes, noise, and harmonics.
 - **DMA-Based Low-Power Operation:** Uses hardware-timed DMA waveform output with a 5 ms TX / 15 ms LISTEN cycle.
-- **Impedance-Matched Transducer Drive:**s Uses amplification and LC matching for efficient power transfer to the piezoelectric transducer.
+- **Impedance-Matched Transducer Drive:** Uses amplification and LC matching for efficient power transfer to the piezoelectric transducer.
 
 ## 5. Technology Stack
 
