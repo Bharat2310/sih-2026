@@ -165,6 +165,7 @@ sih-2026/
 │       ├── mode1_geometricalsweep_raw.jpeg
 │       ├── mode2_phasecoded_final.jpeg
 │       └── mode2_phasecoded_raw.jpeg
+│       ├── future_scope_schematic.jpeg
 │       └── README.md
 ├── .gitignore
 └── LICENSE
