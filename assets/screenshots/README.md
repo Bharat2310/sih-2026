@@ -1,25 +1,25 @@
-# Screenshots
+## Screenshots
 
-Add project screenshots and hardware/prototype photos here.
+Project development and simulation results are documented through the following screenshots.
 
-## Suggested naming convention
+### Before-DAC Simulation — Team A
 
-**Before-DAC model (Team A):**
-- `before-dac-model.png` — full Simulink model view (Decision Logic -> ... -> ZOH -> DAC)
-- `before-dac-result.png` — scope output / simulation result of the before-DAC pipeline
-- `simulink-decision-logic.png` — Decision Logic MATLAB Function block
-- `simulink-modulation-selector.png` — Modulation Selector block
-- `scope-chirp-mode0.png` — scope output for LFM chirp (Mode 0)
-- `scope-sweep-mode1.png` — scope output for geometric sweep (Mode 1)
-- `scope-barker13-mode2.png` — scope output for Barker-13 phase-coded pulse (Mode 2)
+* `before_dac_full_pipeline.png` — Complete Simulink transmitter pipeline before DAC.
+* `decision_logic.jpeg` — Environmental parameter-based decision logic.
+* `mod_select_decision.jpeg` — Modulation mode selection logic.
+* `modulation_selector.jpeg` — Selection between LFM, Geometric Sweep, and Phase-Coded modes.
+* `mode_0_lfm_raw.jpeg` — Raw LFM chirp waveform.
+* `mode_0_lfm_final.jpeg` — Windowed LFM chirp output.
+* `mode_1_geometricsweep_raw.jpeg` — Raw geometric sweep waveform.
+* `mode_1_geometricsweep_final.jpeg` — Windowed geometric sweep output.
+* `mode_2_phasecoded_raw.jpeg` — Raw Barker-13 phase-coded waveform.
+* `mode_2_phasecoded_final.jpeg` — Windowed phase-coded output.
 
-**After-DAC model (Team B):**
-- `after-dac-model.png` — full Simulink/Simscape analog front-end model view (MUX -> Filter -> Amp -> LC Match)
-- `after-dac-result.png` — scope output / simulation result of the analog front-end
+### After-DAC Simulation — Team B
 
-**Hardware / prototype:**
-- `hardware-esp32-setup.jpg` — ESP32 hardware setup (Phase 2)
-- `hardware-analog-frontend.jpg` — analog front-end board (Team B)
-- `prototype-photo.jpg` — full assembled prototype
+* `after_dac_schematic.jpeg` — Analog signal-conditioning and amplification stage after DAC.
+* `after_dac_waveform.jpeg` — Resulting waveform after the analog front-end.
 
-Keep filenames lowercase with hyphens, and prefer `.png` for simulation/scope screenshots and `.jpg` for real photos.
+### Project Assets
+
+Additional hardware and prototype photographs will be added as the physical implementation progresses.
