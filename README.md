@@ -16,26 +16,27 @@ Fixed-frequency sonar transmitters used in Autonomous Underwater Vehicles (AUVs)
 
 We propose a **Software-Defined Sonar (SDS)** transmitter that adapts its waveform in real time based on sensed water conditions, instead of using a single fixed frequency.
 
-The system continuously reads turbidity, depth, and temperature via ADC channels and uses this data to dynamically select:
+The system continuously reads turbidity, depth, and temperature via ADC channels (mapped from potentiometer inputs at the current prototype stage) and uses this data to dynamically select:
 
-- **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band
-- **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band
-- **Modulation type** — LFM chirp, geometric sweep, or Barker-13 phase-coded pulse — selectable per mission requirement
-- **Sound velocity correction** using the Mackenzie (1981) formula, recalculated continuously from real-time temperature
-- A constant **2 cm range resolution (dR_target)** is maintained across all frequency bands
+- **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band — turbidity limits the base frequency band to prevent signal scattering
+- **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band — depth dictates total pulse duration for deeper energy penetration
+- **Modulation type** — automatically decided by the Mod_Select Decision Block, not manually selected: heavy silt (turbidity_voltage > 2.4V) forces Barker-13 phase-coded pulse (Mode 2, overrides all other conditions); deep water (depth_m > 30) forces Geometric Sweep (Mode 1); standard conditions default to LFM Chirp (Mode 0)
+- **Sound velocity correction** using the Mackenzie (1981) formula, recalculated continuously from real-time temperature and fed directly into bandwidth correction every cycle
+- A constant **2 cm range resolution (dR_target)** is maintained across all frequency bands via bandwidth compensation, so even at the worst case of 100 kHz no manual reconfiguration is needed
 
 The design uses a time-shared TX/LISTEN cycle (based on Zhou et al.'s SDS architecture) so the same transducer path handles transmit and receive without conflict. Windowing is switched automatically depending on the modulation mode (Blackman for chirp/sweep, rectangular/light Tukey for phase-coded pulses) to control sidelobes correctly for each waveform type.
 
-The full transmit-side signal chain is validated in Simulink before being ported to embedded C for real-time execution on an ESP32, minimizing the risk of hardware damage during development and keeping debugging tractable.
+The full transmit-side signal chain (Team A) is validated in Simulink before being ported to embedded C for real-time execution on an ESP32, minimizing the risk of hardware damage during development and keeping debugging tractable. On the firmware side, the CPU synthesizes a 100-sample waveform array during the 5 ms TX window, arms a DMA transfer paced by a hardware timer to simulate a 200 kHz Zero-Order Hold, and immediately drops into Light Sleep — waking only briefly on a DMA-completion interrupt to shut the DAC down before sleeping through the remaining LISTEN window. The resulting analog signal is then routed and conditioned by Team B's analog front end (MUX → filter → amplifier → LC match → transducer).
 
 ## 4. Key Features
 
 - Real-time adaptive frequency band switching based on turbidity, depth, and temperature
-- Three selectable modulation modes: LFM chirp, geometric sweep, Barker-13 phase-coded pulse
+- Fully automatic modulation mode selection (LFM chirp / geometric sweep / Barker-13) via the Mod_Select Decision Block — no manual mode input required
 - Continuous sound-velocity compensation (Mackenzie 1981 formula)
 - Constant 2 cm range resolution maintained across all operating bands
-- Time-shared TX/LISTEN pulse gating cycle (Software-Defined Sonar architecture)
+- Time-shared TX/LISTEN pulse gating cycle (0.02s period, 25% duty — 5ms TX / 15ms LISTEN), Software-Defined Sonar architecture
 - Simulink-verified signal chain before embedded firmware porting, reducing hardware risk
+- DMA-driven ZOH output with CPU Light Sleep during transmission for power optimization
 
 ## 5. Technology Stack
 
@@ -52,10 +53,10 @@ See [docs/architecture.md](docs/architecture.md) for the full block diagram and 
 
 ```
 Turbidity ADC ─┐
-Depth ADC ─────┼──> Decision Logic (MATLAB Function) ──> Center Freq, T_pulse, Sound Velocity
+Depth ADC ─────┼──> Decision Logic + Mod_Select Decision Block ──> Center Freq, T_pulse, Sound Velocity, Mode (0/1/2)
 Temperature ───┘                     |
                                       v
-Modulation Select ──> Modulation Selector (Mode 0: LFM Chirp / Mode 1: Geometric Sweep / Mode 2: Barker-13)
+Modulation Selector (Mode 0: LFM Chirp / Mode 1: Geometric Sweep / Mode 2: Barker-13, auto-selected)
                                       |
                                       v
                         Conditional Windowing (Blackman / Rectangular-Tukey)
@@ -64,11 +65,15 @@ Modulation Select ──> Modulation Selector (Mode 0: LFM Chirp / Mode 1: Geome
                     TX/LISTEN Pulse Gating (0.02s period, 25% duty cycle)
                                       |
                                       v
-              Buffer(100) -> Unbuffer -> ZOH (5e-6s / 200kHz) -> DAC
+              Buffer(100) -> Unbuffer -> ZOH (5e-6s / 200kHz) -> DAC        [ Team A: digital chain ]
                                       |
                                       v
-                    Analog Front End (MUX -> Filter -> Amplifier -> LC Match -> Transducer)
+              MUX -> Sallen-Key Filter -> Amplifier (24Vpp) -> LC Match -> Transducer   [ Team B: analog front end ]
 ```
+
+**Team A (digital chain):** ESP32 generates the raw waveform (LFM/sweep/Barker-13), applies Hamming/Blackman/Tukey windowing in software, and streams it through the buffer → ZOH → DAC pipeline via DMA while the CPU sleeps.
+
+**Team B (analog front end):** The CD4051 MUX dynamically routes the DAC output to one of three environment-specific filter profiles (Clear/Murky/Muddy), driven by ESP32's routing signal as the frequency changes — a dedicated-path topology that avoids dynamically switching individual passive components. The LT1058 Sallen-Key stage (2nd-order Butterworth low-pass, 3 cutoff profiles) removes switching noise/harmonics before the LT1122 + Class-AB amplifier (7.2x gain, BD139/BD140 push-pull on 18V rails) delivers a clean 24Vpp signal with no crossover distortion. The LC impedance matching network then cancels the transducer's capacitive reactance to minimize reflected energy and heat.
 
 ## 7. Repository Structure
 
@@ -157,8 +162,9 @@ MATLAB/Simulink models require **MATLAB R2026a** with the **DSP System Toolbox**
 
 - Update the ZOH sample rate (currently 200 kHz) to at least 1.25 MHz+ to properly support the 500 kHz band without Nyquist violation
 - Confirm actual depth threshold values with the analog/hardware team (currently placeholder midpoints: 2.5 m / 17.5 m / 30 m)
+- **Ping-Pong Buffering:** Dual-buffer DMA scheme so the CPU synthesizes the next 100-sample frame while DMA transmits the current one, minimizing CPU active time with zero inter-frame latency/jitter (trade-off: doubles RAM footprint). Planned refinement: hardware-level automatic buffer-pointer swap on DMA interrupt.
+- **ADC Hysteresis & Deadbanding (EMA filtering):** Smooths turbidity/temperature ADC reads so the system reacts to real environmental trends instead of chattering between modes around hard thresholds (e.g. 2.4V turbidity), at the cost of slight reaction lag. Planned refinement: bit-shifting EMA calculations instead of division to remove CPU overhead.
 - Dynamic Voltage Scaling (DVS) via a digitally controlled DC-DC boost converter for extended battery life (~40% projected improvement)
-- Hysteresis / EMA filtering on turbidity and temperature sensing for robustness against thermocline effects and sensor noise in real ocean conditions
 - Migrate MCP4725 I2C DAC output to DMA + hardware-timer-driven streaming to remove I2C speed bottlenecks at high frequencies
 - Integrate the adaptive chirp signal into the full power-delivery Simscape model (buck converter reference input)
 
