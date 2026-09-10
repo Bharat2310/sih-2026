@@ -6,7 +6,7 @@ Upload the **final SIH presentation (PPT/PPTX)** in this `submission/` folder an
 
 Replace the placeholder below with the actual file name once uploaded:
 
-- **PPT:** `[Open Final Presentation]([https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8])`
+- **PPT:** `[Open Final Presentation]([https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8)`
 
 ### Requirements
 
