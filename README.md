@@ -138,16 +138,17 @@ Temperature ───┘                    │
 ```
 sih-2026/
 ├── README.md
-├── SUBMISSION_GUIDE.md
 ├── submission/
 │   ├── PRESENTATION.md      # link to final PPT
 │   └── DEMO.md              # link to prototype demo video
 ├── src/
 │   ├── simulink/
-│   │   ├── before_dac_model.slx     # Team A - digital chirp pipeline (Decision Logic -> ... -> ZOH -> DAC)
-│   │   └── after_dac_model.slx      # Team B - analog front-end Simscape model (MUX -> Filter -> Amp -> LC Match)
-│   └── esp32-firmware/
-│       └── (ESP32 .ino / .c / .h source files)
+│   │   └── before_dac_model.slx     # digital pipeline (Decision Logic -> ... -> ZOH -> DAC)
+│   ├── esp32-firmware/
+│   │   └── esp32-firmware.ino       # ESP32 firmware (tested build)
+│   └── ltspice/
+│       ├── after_dac_model.asc      # analog front-end circuit (after DAC)
+│       └── working_analog.asc       # working analog reference circuit
 ├── docs/
 │   └── architecture.md
 ├── assets/
@@ -155,9 +156,6 @@ sih-2026/
 │       ├── before-dac-result.png    # Team A simulation result screenshot
 │       ├── after-dac-result.png     # Team B simulation result screenshot
 │       └── README.md
-├── auv-backend/          # existing backend code
-├── sih_tech_frontend/    # existing frontend code
-├── requirements.txt
 ├── .gitignore
 └── LICENSE
 ```
