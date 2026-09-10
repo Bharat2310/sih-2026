@@ -23,11 +23,11 @@ The system continuously reads **turbidity**, **depth**, and **temperature** via 
 - **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band — turbidity limits the base frequency band to prevent signal scattering
 - **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band — depth dictates total pulse duration for deeper energy penetration
 - **Modulation type** — automatically decided by the Mod_Select Decision Block, not manually selected:
-1. heavy silt (turbidity_voltage > 2.4V) forces Barker-13 phase-coded pulse (Mode 2, overrides all other conditions)
-2. deep water (depth_m > 30) forces Geometric Sweep (Mode 1)
-3. standard conditions default to LFM Chirp (Mode 0)
+         1. heavy silt (turbidity_voltage > 2.4V) forces Barker-13 phase-coded pulse 
+         2. deep water (depth_m > 30) forces Geometric Sweep (Mode 1)
+         3. standard conditions default to LFM Chirp (Mode 0)
 - **Sound velocity correction** using the Mackenzie (1981) formula, recalculated continuously from real-time temperature and fed directly into bandwidth correction every cycle
-- Bandwidth — dynamically compensated to maintain a target 2 cm range resolution (dR_target) across the operating frequency bands, eliminating the need for manual reconfiguration even at the 100 kHz operating point.
+- **Bandwidth** dynamically compensated to maintain a target 2 cm range resolution (dR_target) across the operating frequency bands, eliminating the need for manual reconfiguration even at the 100 kHz operating point.
 
 **DIGITAL WAVEFORM GENERATION AND LOW POWER TRANSMISSION**
 
@@ -43,6 +43,7 @@ This creates a time-shared TX/LISTEN cycle, allowing the same transducer path to
 **ANALOG SIGNAL CONDITIONING AND POWER DELIVERY**
 
 After digital synthesis and DAC conversion, the waveform becomes a low-voltage (~3.3 V) analog signal. This signal is then processed by analog front end to clean, amplify, and efficiently couple it to the piezoelectric sonar transducer.
+
 Analog chain: 
 1. Signal Routing — CD4051 Analog MUX
 The CD4051 MUX routes the waveform to one of three dedicated Clear, Murky, or Muddy filter paths based on the environmental condition provided by the ESP32.
