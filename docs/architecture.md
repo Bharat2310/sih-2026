@@ -1,4 +1,4 @@
-# System Architecture — Adaptive Software-Defined Sonar Transmitter
+# Adaptive Software-Defined Sonar Transmitter
 
 ## 1. Overview
 
