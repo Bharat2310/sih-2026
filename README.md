@@ -45,15 +45,15 @@ This creates a time-shared TX/LISTEN cycle, allowing the same transducer path to
 After digital synthesis and DAC conversion, the waveform becomes a low-voltage (~3.3 V) analog signal. This signal is then processed by analog front end to clean, amplify, and efficiently couple it to the piezoelectric sonar transducer.
 
 Analog chain: 
-1. Signal Routing — CD4051 Analog MUX
+1. Signal Routing: CD4051 Analog MUX
 The CD4051 MUX routes the waveform to one of three dedicated Clear, Murky, or Muddy filter paths based on the environmental condition provided by the ESP32.
-2. Signal Conditioning — LT1058 Filter
+2. Signal Conditioning: LT1058 Filter
 The selected path uses an LT1058 Sallen-Key 2nd-order Butterworth low-pass filter with a condition-specific cutoff frequency. It removes unwanted high-frequency switching noise and harmonics, producing a cleaner ~3.3 V waveform.
-3. Power Amplification — LM318M + Class-AB Stage
+3. Power Amplification: LM318M + Class-AB Stage
 The filtered signal is amplified using an LM318M driver with a 7.2× feedback gain, followed by a Class-AB BD139/BD140 push-pull stage powered from 18 V rails. This provides the high-voltage, high-current drive required by the transducer, targeting approximately 24 Vpp output.
-4. Impedance Matching — LC Network
+4. Impedance Matching: LC Network
 Since the piezoelectric transducer behaves predominantly as a capacitive load, the LC network uses an inductive component to compensate for its capacitive reactance, improve electrical resonance, and enable more efficient power transfer.
-5. Acoustic Transmission — Piezoelectric Transducer
+5. Acoustic Transmission: Piezoelectric Transducer
 The matched high-voltage waveform is applied to the piezoelectric transducer, which converts the electrical excitation into mechanical vibration and generates the acoustic sonar pulse in water.
 
 This completes the transmitter-side signal chain, with the transducer converting the conditioned electrical waveform into the acoustic sonar pulse for underwater transmission.
@@ -185,9 +185,7 @@ sih-2026/
 
 ## 10. Screenshots / Prototype Photos
 
-Add Simulink model screenshots, scope captures, and hardware/prototype photos to:
-
-`assets/screenshots/`
+Simulink model screenshots, scope captures, and hardware/prototype photos to: `assets/screenshots/`
 
 See [assets/screenshots/README.md](assets/screenshots/README.md) for naming conventions.
 
