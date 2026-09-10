@@ -189,7 +189,6 @@ Clone the repository and install the required dependencies:
 bash
 git clone https://github.com/Bharat2310/sih-2026.git
 cd sih-2026
-
 ```
 
 Prerequisites
