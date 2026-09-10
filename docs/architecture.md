@@ -1,6 +1,3 @@
-Here is your complete, cleanly formatted `docs/architecture.md` file ready to copy and paste directly into your repository.
-
-```markdown
 # Architecture
 
 ## Overview
