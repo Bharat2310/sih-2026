@@ -1,159 +1,181 @@
-```
+Here is your complete, cleanly formatted `docs/architecture.md` file ready to copy and paste directly into your repository.
+
+```markdown
 # Architecture
 
 ## Overview
 
-The system is a **software-defined, real-time adaptive sonar transmitter** for Autonomous Underwater Vehicles (AUVs). It uses a time-shared **TX/LISTEN architecture** in which the transmitted waveform is dynamically adapted according to environmental conditions such as turbidity, depth, and temperature.
+The system is a **software-defined, real-time adaptive sonar transmitter** designed for Autonomous Underwater Vehicles (AUVs). It uses a time-shared **TX/LISTEN architecture** in which transmitted waveforms are dynamically adapted according to real-time environmental conditions such as turbidity, water depth, and temperature.
 
-The system combines a digital waveform-generation pipeline with an analog signal-conditioning and power-delivery stage.
+The architecture bridges a digital waveform-generation pipeline with an analog signal-conditioning and high-power delivery stage.
 
-| Model | File | Scope |
+| Model | File Path | Functional Scope |
 |---|---|---|
-| Before-DAC Digital Pipeline | `src/simulink/before_dac_model.slx` | Decision Logic → Modulation Selection → Windowing → TX/LISTEN Gating → Buffer/ZOH → DAC |
-| After-DAC Analog Front-End | `src/simulink/after_dac_model.slx` | DAC → CD4051 MUX → LT1058 Filter → Power Amplifier → LC Matching → Transducer |
+| **Before-DAC Digital Pipeline** | `src/simulink/before_dac_model.slx` | Decision Logic → Modulation Selection → Windowing → TX/LISTEN Gating → Buffer/ZOH → DAC |
+| **After-DAC Analog Front-End** | `src/simulink/after_dac_model.slx` | DAC → CD4051 MUX → LT1058 Filter → Power Amplifier → LC Matching → Transducer |
+
+---
+
+## Complete System Flow Architecture
+
+```text
+  [ Turbidity ]   ──┐
+  [ Depth ]       ──┼──> Decision Logic
+  [ Temperature ] ──┘         │
+                              ▼
+                     Modulation Selection
+                              │
+                              ▼
+                     Waveform Synthesis
+                              │
+                              ▼
+                    Conditional Windowing
+                              │
+                              ▼
+                     TX/LISTEN Gating
+                              │
+                              ▼
+                     Buffer (100 Samples)
+                              │
+                              ▼
+                          ZOH / DMA
+                              │
+                              ▼
+                             DAC
+                              │
+                              ▼
+                      CD4051 Analog MUX
+                              │
+                              ▼
+                    LT1058 Active Filter
+                              │
+                              ▼
+                LM318M + Class-AB Amplifier
+                              │
+                              ▼
+                     LC Matching Network
+                              │
+                              ▼
+                   Piezoelectric Transducer
+
+```
+
+---
 
 ## Simulink Transmit Pipeline
 
 ### 1. Environmental Adaptation & Decision Logic
 
-The system maps environmental inputs to waveform parameters and dynamically determines the transmission configuration.
+The system maps analog environmental inputs to waveform parameters and dynamically calculates optimal transmission configurations:
 
-- **Turbidity:** Selects the operating center-frequency band to reduce scattering.
-- **Depth:** Determines the pulse duration required for deeper-water penetration.
-- **Temperature:** Used to calculate the real-time speed of sound and correct the required bandwidth.
-- **Resolution:** Bandwidth is dynamically adjusted to maintain a target range resolution of **2 cm**.
+* **Turbidity:** Selects the operating center-frequency band to minimize acoustic scattering.
+* **Depth:** Determines the total pulse duration required for deep-water signal penetration.
+* **Temperature:** Computes real-time acoustic sound velocity in water to correct required sweep bandwidth.
+* **Resolution:** Bandwidth is dynamically adjusted to maintain a constant target range resolution of **2 cm**.
 
-The current frequency mapping is:
+#### Operating Mappings
 
-| Turbidity ADC | Center Frequency |
-|---|---|
-| 0–1000 | 500 kHz |
-| 1001–3000 | 250 kHz |
-| 3001–4095 | 100 kHz |
+**Frequency Band Selection:**
 
-The current depth mapping uses three pulse-duration bands:
+| Turbidity (ADC Range) | Center Frequency ($f_c$) |
+| --- | --- |
+| `0 – 1000` | **500 kHz** |
+| `1001 – 3000` | **250 kHz** |
+| `3001 – 4095` | **100 kHz** |
 
-| Depth Band | Pulse Duration |
-|---|---|
-| Shallow | 1 ms |
-| Mid | 10 ms |
-| Deep | 50 ms |
+**Pulse Duration Bands:**
 
-> **Note:** The exact physical depth thresholds are provisional and will be finalized during hardware validation.
+| Depth Band | Pulse Duration ($\tau$) |
+| --- | --- |
+| **Shallow** | 1 ms |
+| **Mid** | 10 ms |
+| **Deep** | 50 ms |
+
+> **Note:** Physical depth thresholds are provisional and subject to final hardware field validation.
+
+---
 
 ### 2. Modulation Selection
 
-The system automatically selects the appropriate waveform according to the environmental conditions:
+Depending on environmental noise and operational objectives, the decision engine routes signal synthesis through one of three modulation schemes:
 
-- **Mode 0:** LFM Chirp
-- **Mode 1:** Geometric Sweep
-- **Mode 2:** Barker-13 Phase-Coded Pulse
+* **Mode 0:** Linear Frequency Modulation (LFM Chirp)
+* **Mode 1:** Geometric Sweep
+* **Mode 2:** Phase-Coded Pulse (Barker-13)
+
+---
 
 ### 3. Digital Signal Synthesis & Windowing
 
-During the transmit phase, the selected waveform is mathematically synthesized and stored in a **100-sample discrete buffer**.
+During the transmit phase, the selected waveform is mathematically synthesized into a discrete **100-sample ring buffer**. To suppress spectral splatter and unwanted sidelobe energy during switching transitions, conditional windowing is applied:
 
-Windowing is applied to reduce sudden voltage transitions and unwanted sidelobe energy:
+* **Blackman Window:** Applied to LFM Chirp and Geometric Sweeps.
+* **Tukey / Light Tukey Window:** Applied to Barker-13 Phase-Coded Pulses.
 
-- **Blackman window:** LFM Chirp and Geometric Sweep
-- **Tukey / light Tukey window:** Barker-13 Phase-Coded Pulse
+---
 
 ### 4. TX/LISTEN Gating
 
-The transmitter operates using a time-shared cycle:
+To maximize power efficiency and prevent receiver saturation, the system employs time-shared duty gating:
 
-- **Cycle period:** 20 ms
-- **TX window:** 5 ms
-- **LISTEN window:** 15 ms
-- **TX duty cycle:** 25%
+* **Cycle Period:** 20 ms
+* **TX Window:** 5 ms
+* **LISTEN Window:** 15 ms
+* **TX Duty Cycle:** 25%
 
-This reduces unnecessary CPU and DAC activity during the listening phase.
+This timing structure drastically reduces idle CPU execution and DAC power dissipation during the echo-reception (LISTEN) phase.
+
+---
 
 ### 5. DMA-Based Waveform Output
 
-A hardware timer controls the output sampling interval while DMA transfers the prepared waveform buffer to the DAC with minimal CPU intervention.
+```text
+┌──────────────────────┐      ┌──────────────────────┐      ┌──────────────────────┐
+│  100-Sample Buffer   │ ───> │      Zero-Order      │ ───> │     Internal DAC     │
+│  (Synthesized RAM)   │      │     Hold (ZOH)       │      │   (Hardware Output)  │
+└──────────────────────┘      └──────────────────────┘      └──────────────────────┘
 
-The current simulation uses a **200 kHz ZOH rate (5 μs interval)**.
+```
+
+A hardware timer enforces determinism over sample intervals while direct memory access (**DMA**) transfers buffer contents to the DAC with zero CPU intervention. The baseline simulation operates at a **200 kHz ZOH rate** (5 $\mu$s sample interval).
+
+---
 
 ## Analog Front-End
 
-The DAC output passes through the following signal-conditioning and power-delivery chain:
+The output stage condition-matches, amplifies, and drives the acoustic output load:
 
 ```text
-DAC Output
-    ↓
-CD4051 Analog MUX
-    ↓
-LT1058 Sallen-Key Filter
-    ↓
-LM318M + Class-AB Power Amplifier
-    ↓
-LC Impedance Matching Network
-    ↓
-Piezoelectric Transducer
+[ DAC Output ] ──> [ CD4051 MUX ] ──> [ LT1058 Filter ] ──> [ LM318M + Class-AB PA ] ──> [ LC Matching ] ──> [ Piezo Transducer ]
+
 ```
 
-* **CD4051 Analog MUX:** Routes the signal through the appropriate filter path for the selected environmental condition.
-* **LT1058 Sallen-Key Filter:** Provides condition-specific low-pass filtering to suppress high-frequency switching noise and harmonics.
-* **LM318M + Class-AB Stage:** Amplifies the conditioned signal using an approximately **7.2× driver gain** and 18 V supply rails, targeting approximately **24 Vpp** output.
-* **LC Matching Network:** Compensates for the predominantly capacitive transducer load to improve resonance and power transfer.
-* **Piezoelectric Transducer:** Converts the amplified electrical waveform into the transmitted acoustic pulse.
+* **CD4051 Analog MUX:** Digitally switches the raw analog output across dedicated filter topologies depending on the selected operating frequency band.
+* **LT1058 Sallen-Key Filter:** Active low-pass active filter stage configured to suppress high-frequency harmonic distortion and DAC quantization noise.
+* **LM318M + Class-AB Power Amplifier:** Amplifies signal amplitude using a **7.2× driver gain** powered by **$\pm 18\text{ V}$ rails**, producing an target signal level of **24 $\text{V}_{\text{pp}}$**.
+* **LC Impedance Matching Network:** Passive reactive network that cancels out the high intrinsic capacitive reactance of the transducer to maximize active real-power transfer at resonance.
+* **Piezoelectric Transducer:** Electro-acoustic element converting high-voltage electrical waveforms into focused underwater acoustic pulses.
 
-## Hardware / Embedded Architecture
+---
 
-* **ESP32:** Performs ADC acquisition, decision logic, waveform synthesis, digital windowing, buffer management, and hardware-timed waveform output.
-* **DAC:** Converts the digitally synthesized waveform into the analog signal supplied to the analog front-end.
-* **Analog Front-End:** Filters, amplifies, and impedance-matches the waveform before driving the transducer.
-* **KiCad:** Used for schematic and hardware design of the analog front-end.
+## Embedded & System Hardware Architecture
 
-## Key Design Principles
+* **Microcontroller (ESP32):** Responsible for high-speed ADC sampling (environmental sensors), decision matrix evaluation, waveform math generation, digital windowing, DMA stream management, and hardware timer interrupt dispatching.
+* **DAC Module:** Renders synthesized digital waveform vectors into precise analog voltages.
+* **Analog Front-End Board:** Multi-stage signal processing unit handling active filtering, switching, driver gain, power amplification, and inductive load matching.
+* **KiCad Design Suite:** Project platform for all physical schematic design, PCB routing, and high-frequency analog layout validation.
 
-* **Adaptive Waveform Generation:** Environmental inputs influence frequency, pulse duration, bandwidth, and modulation selection.
-* **Constant Resolution:** Temperature-based acoustic velocity correction and bandwidth adaptation maintain the target **2 cm resolution** across operating conditions.
-* **Hardware-Timed Output:** Hardware timers provide deterministic DAC sample timing independent of CPU execution latency.
-* **DMA-Based Streaming:** DMA reduces continuous CPU involvement during waveform transmission.
-* **Low-Power Operation:** The CPU enters a low-power state after initiating DMA transmission and wakes briefly on DMA completion before returning to sleep during the LISTEN phase.
-* **Modular Signal Conditioning:** Dedicated analog filter paths are selected according to environmental conditions.
+---
 
-## System Architecture
+## Key Engineering & Design Principles
 
-```text
-Turbidity ─┐
-Depth ─────┼──→ Decision Logic
-Temperature ┘          │
-                       ↓
-               Modulation Selection
-                       │
-                       ↓
-                Waveform Synthesis
-                       │
-                       ↓
-               Conditional Windowing
-                       │
-                       ↓
-                TX/LISTEN Gating
-                       │
-                       ↓
-                  Buffer (100)
-                       │
-                       ↓
-                    ZOH / DMA
-                       │
-                       ↓
-                      DAC
-                       │
-                       ↓
-                CD4051 Analog MUX
-                       │
-                       ↓
-              LT1058 Active Filter
-                       │
-                       ↓
-          LM318M + Class-AB Amplifier
-                       │
-                       ↓
-              LC Matching Network
-                       │
-                       ↓
-           Piezoelectric Transducer
+* **Adaptive Waveform Generation:** Real-time sensor-driven tuning of carrier frequency, envelope duration, bandwidth, and pulse modulation mode.
+* **Constant Spatial Resolution:** Automatic calculation of sound velocity based on real-time water temperature to dynamically expand or contract sweep bandwidth, preserving a strict 2 cm spatial resolution target.
+* **Deterministic Output Execution:** Hardware-driven timer interrupt loops bypass software timing jitter to supply jitter-free DAC sampling.
+* **DMA-Driven Memory Offloading:** Continuous waveform streaming occurs asynchronously in hardware without occupying execution cycles on the core processor.
+* **Low-Power Operational Profile:** ESP32 drops into low-power sleep modes immediately after initializing DMA streams, waking only upon transaction completion for LISTEN cycle management.
+* **Modular Filter Selection:** Active multi-path signal conditioning dynamically matches attenuation characteristics to environmental frequency selection.
+
+```
+
 ```
