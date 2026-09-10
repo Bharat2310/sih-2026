@@ -112,14 +112,14 @@ During the 5 ms TX window, the ESP32 computes a 100-sample waveform array for th
 | Acoustic transmission | Piezoelectric transducer | Converts the conditioned electrical waveform into the acoustic sonar pulse |
 
 ## 5. Key Architectural Features
-1. Real-Time Environmental Adaptation: Turbidity, depth, and temperature directly influence transmission parameters.
-2. Adaptive Frequency Selection: Operating frequency shifts between 100 kHz, 250 kHz, and 500 kHz according to turbidity.
-3. Adaptive Pulse Duration: Pulse duration changes between 1 ms, 10 ms, and 50 ms according to depth.
-4. Dynamic Bandwidth Compensation: Temperature-based sound velocity correction dynamically determines the required bandwidth.
-5. 2 cm Target Resolution: Bandwidth is calculated using the acoustic range-resolution relationship.
-6. Three Modulation Modes: LFM Chirp, Geometric Sweep, and Barker-13 Phase Coding.
-7. Digital + Analog Signal Conditioning: Digital windowing is followed by analog filtering.
-8. TX/LISTEN Operation: A 5 ms TX window followed by a 15 ms LISTEN window enables time-shared sonar operation.
-9. DMA-Compatible Waveform Streaming: Buffered waveform generation reduces continuous CPU involvement during transmission.
-10.Efficient Transducer Drive: Power amplification and LC impedance matching improve energy transfer to the piezoelectric transducer.
+1. **Real-Time Environmental Adaptation:** Turbidity, depth, and temperature directly influence transmission parameters.
+2. **Adaptive Frequency Selection:** Operating frequency shifts between 100 kHz, 250 kHz, and 500 kHz according to turbidity.
+3. **Adaptive Pulse Duration:** Pulse duration changes between 1 ms, 10 ms, and 50 ms according to depth.
+4. **Dynamic Bandwidth Compensation:** Temperature-based sound velocity correction dynamically determines the required bandwidth.
+5. **2 cm Target Resolution:** Bandwidth is calculated using the acoustic range-resolution relationship.
+6. **Three Modulation Modes:** LFM Chirp, Geometric Sweep, and Barker-13 Phase Coding.
+7. **Digital + Analog Signal Conditioning:** Digital windowing is followed by analog filtering.
+8. **TX/LISTEN Operation:** A 5 ms TX window followed by a 15 ms LISTEN window enables time-shared sonar operation.
+9. **DMA-Compatible Waveform Streaming:** Buffered waveform generation reduces continuous CPU involvement during transmission.
+10. **Efficient Transducer Drive:** Power amplification and LC impedance matching improve energy transfer to the piezoelectric transducer.
 
