@@ -217,7 +217,3 @@ LTSpice
 - Dynamic Voltage Scaling (DVS) via a digitally controlled DC-DC boost converter for extended battery life (~40% projected improvement)
 - Migrate MCP4725 I2C DAC output to DMA + hardware-timer-driven streaming to remove I2C speed bottlenecks at high frequencies
 - Integrate the adaptive chirp signal into the full power-delivery Simscape model (buck converter reference input)
-
-## Important
-
-Before submission, make sure the repository is accessible to reviewers. Do **not** upload passwords, API keys, access tokens, `.env` files containing secrets, or other confidential credentials.
