@@ -15,6 +15,11 @@ build/
 *.autosave
 slprj/
 
+# LTSpice
+*.raw
+*.op.raw
+*.bak
+
 # OS
 .DS_Store
 Thumbs.db
