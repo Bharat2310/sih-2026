@@ -2,72 +2,135 @@
 
 ## 1. Project Information
 
-- **Project Title:** Adaptive Sonar — Software-Defined Chirp Transmitter for AUVs
-- **PS ID:** _(fill in your actual SIH Problem Statement ID)_
-- **PS Title:** _(fill in your actual PS title, e.g. "Adaptive sonar system for underwater vehicles operating across varying water conditions")_
+- **Project Title:** Adaptive Software-Defined Sonar Transmitter for AUVs
+- **PS ID:** 26058
+- **PS Title:** Development of a Low-Power, Real-Time Adaptive Software-Defined Sonar Transmitter Payload for Autonomous Underwater Vehicles (AUVs)
 - **Category:** Hardware
-- **Theme:** Robotics and Drones / Defence
+- **Theme:** Robotics and Drones
 
 ## 2. Problem Statement
 
-Fixed-frequency sonar transmitters used in Autonomous Underwater Vehicles (AUVs) perform poorly when water conditions change. High turbidity, varying depth, and temperature gradients all affect how sound propagates underwater, causing loss of resolution, weak returns, or complete signal degradation. A sonar system tuned for clear, shallow water fails in turbid or deep-water conditions, and vice versa — there is no single fixed frequency/pulse configuration that works well everywhere.
+Fixed-frequency sonar transmitters used in Autonomous Underwater Vehicles (AUVs) perform poorly when water conditions change. High turbidity, varying depth and temperature gradients all affect how sound propagates underwater, causing loss of resolution, weak returns, or complete signal degradation. A sonar system tuned for clear, shallow water fails in turbid or deep-water conditions, and vice versa,  there is no single fixed frequency/pulse configuration that works well everywhere.
 
 ## 3. Proposed Solution
 
 We propose a **Software-Defined Sonar (SDS)** transmitter that adapts its waveform in real time based on sensed water conditions, instead of using a single fixed frequency.
 
-The system continuously reads turbidity, depth, and temperature via ADC channels and uses this data to dynamically select:
+The system continuously reads **turbidity**, **depth**, and **temperature** via ADC channels (mapped from potentiometer inputs at the current prototype stage) and uses this data to dynamically determine the most suitable suitable transmission configuration and parameters.
 
-- **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band
-- **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band
-- **Modulation type** — LFM chirp, geometric sweep, or Barker-13 phase-coded pulse — selectable per mission requirement
-- **Sound velocity correction** using the Mackenzie (1981) formula, recalculated continuously from real-time temperature
-- A constant **2 cm range resolution (dR_target)** is maintained across all frequency bands
+**ADAPTIVE WAVEFORM AND PARAMETER SELECTION**
 
-The design uses a time-shared TX/LISTEN cycle (based on Zhou et al.'s SDS architecture) so the same transducer path handles transmit and receive without conflict. Windowing is switched automatically depending on the modulation mode (Blackman for chirp/sweep, rectangular/light Tukey for phase-coded pulses) to control sidelobes correctly for each waveform type.
+- **Center frequency** (500 kHz / 250 kHz / 100 kHz) based on turbidity band — turbidity limits the base frequency band to prevent signal scattering
+- **Pulse width (T_pulse)** (1 ms / 10 ms / 50 ms) based on depth band — depth dictates total pulse duration for deeper energy penetration
+- **Modulation type** — automatically decided by the Mod_Select Decision Block, not manually selected:
+         1. heavy silt (turbidity_voltage > 2.4V) forces Barker-13 phase-coded pulse 
+         2. deep water (depth_m > 30) forces Geometric Sweep (Mode 1)
+         3. standard conditions default to LFM Chirp (Mode 0)
+- **Sound velocity correction** using the Mackenzie (1981) formula, recalculated continuously from real-time temperature and fed directly into bandwidth correction every cycle
+- **Bandwidth** dynamically compensated to maintain a target 2 cm range resolution (dR_target) across the operating frequency bands, eliminating the need for manual reconfiguration even at the 100 kHz operating point.
 
-The full transmit-side signal chain is validated in Simulink before being ported to embedded C for real-time execution on an ESP32, minimizing the risk of hardware damage during development and keeping debugging tractable.
+**DIGITAL WAVEFORM GENERATION AND LOW POWER TRANSMISSION**
+
+The selected waveform is synthesized digitally by the ESP32. During the 5 ms TX window, the CPU computes a 100-sample waveform array corresponding to the required modulation, frequency, bandwidth and pulse duration.
+The waveform then passes through mode-dependent digital windowing:
+1. Blackman window for LFM chirps and geometric sweeps to control sidelobes and reduce spectral leakage
+2. Rectangular/light Tukey window for Barker-13 phase-coded pulses, where preserving the individual phase-coded chips is important.
+
+Once the waveform is prepared, the ESP32 arms a hardware timer and DMA transfer. The DMA autonomously transfers the 100 samples from RAM to the DAC at a 200 kHz sample rate, corresponding to a 5 μs Zero-Order Hold (ZOH) interval. This allows the CPU to immediately enter Light Sleep instead of continuously driving the DAC in software.
+When the DMA transfer finishes, a hardware interrupt wakes the CPU briefly. The CPU shuts down the DAC to prevent unnecessary static power consumption and then returns to sleep during the remaining LISTEN period.
+This creates a time-shared TX/LISTEN cycle, allowing the same transducer path to be used for transmission and reception without simultaneous TX/RX conflict.
+
+**ANALOG SIGNAL CONDITIONING AND POWER DELIVERY**
+
+After digital synthesis and DAC conversion, the waveform becomes a low-voltage (~3.3 V) analog signal. This signal is then processed by analog front end to clean, amplify, and efficiently couple it to the piezoelectric sonar transducer.
+
+Analog chain: 
+1. Signal Routing: CD4051 Analog MUX
+The CD4051 MUX routes the waveform to one of three dedicated Clear, Murky, or Muddy filter paths based on the environmental condition provided by the ESP32.
+2. Signal Conditioning: LT1058 Filter
+The selected path uses an LT1058 Sallen-Key 2nd-order Butterworth low-pass filter with a condition-specific cutoff frequency. It removes unwanted high-frequency switching noise and harmonics, producing a cleaner ~3.3 V waveform.
+3. Power Amplification: LM318M + Class-AB Stage
+The filtered signal is amplified using an LM318M driver with a 7.2× feedback gain, followed by a Class-AB BD139/BD140 push-pull stage powered from 18 V rails. This provides the high-voltage, high-current drive required by the transducer, targeting approximately 24 Vpp output.
+4. Impedance Matching: LC Network
+Since the piezoelectric transducer behaves predominantly as a capacitive load, the LC network uses an inductive component to compensate for its capacitive reactance, improve electrical resonance, and enable more efficient power transfer.
+5. Acoustic Transmission: Piezoelectric Transducer
+The matched high-voltage waveform is applied to the piezoelectric transducer, which converts the electrical excitation into mechanical vibration and generates the acoustic sonar pulse in water.
+
+This completes the transmitter-side signal chain, with the transducer converting the conditioned electrical waveform into the acoustic sonar pulse for underwater transmission.
 
 ## 4. Key Features
 
-- Real-time adaptive frequency band switching based on turbidity, depth, and temperature
-- Three selectable modulation modes: LFM chirp, geometric sweep, Barker-13 phase-coded pulse
-- Continuous sound-velocity compensation (Mackenzie 1981 formula)
-- Constant 2 cm range resolution maintained across all operating bands
-- Time-shared TX/LISTEN pulse gating cycle (Software-Defined Sonar architecture)
-- Simulink-verified signal chain before embedded firmware porting, reducing hardware risk
+- **Real-Time Environmental Adaptation:** Dynamically adapts waveform parameters using turbidity, depth, and temperature.
+- **Adaptive 100–500 kHz Operation:** Shifts frequency according to turbidity to reduce scattering.
+- **Consistent 2 cm Resolution:** Dynamically compensates bandwidth across operating frequencies.
+- **3-Mode Waveform Selection:** Automatically switches between LFM Chirp, Geometric Sweep, and Barker-13 Phase Coding.
+- **Temperature-Based Correction:** Continuously calculates acoustic velocity for accurate bandwidth control.
+- **Dual-Stage Signal Conditioning:** Combines digital windowing with dedicated analog filtering to reduce sidelobes, noise, and harmonics.
+- **DMA-Based Low-Power Operation:** Uses hardware-timed DMA waveform output with a 5 ms TX / 15 ms LISTEN cycle.
+- **Impedance-Matched Transducer Drive:** Uses amplification and LC matching for efficient power transfer to the piezoelectric transducer.
 
 ## 5. Technology Stack
 
-- **Simulation / Signal Design:** MATLAB R2026a (Simulink, DSP System Toolbox)
+- **Simulation / Signal Design:** MATLAB R2026a (Simulink, DSP System Toolbox), LTSpice 
 - **Embedded Firmware:** ESP32 (C, hardware timers, ISR-driven waveform synthesis, DMA)
-- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LT1122 / Class-AB power amplifier, LC impedance matching network
 - **DAC (Phase 2 hardware):** MCP4725 (I2C)
-- **PCB / Schematic Design:** KiCad
+- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318M / Class-AB power amplifier, LC impedance matching network
 - **Version Control:** Git / GitHub
 
 ## 6. Architecture
 
-See [docs/architecture.md](docs/architecture.md) for the full block diagram and signal chain explanation.
-
+The system follows an adaptive digital-to-analog signal chain in which environmental inputs determine the transmission frequency, pulse duration, sound-velocity correction, and modulation mode. 
 ```
 Turbidity ADC ─┐
-Depth ADC ─────┼──> Decision Logic (MATLAB Function) ──> Center Freq, T_pulse, Sound Velocity
-Temperature ───┘                     |
-                                      v
-Modulation Select ──> Modulation Selector (Mode 0: LFM Chirp / Mode 1: Geometric Sweep / Mode 2: Barker-13)
-                                      |
-                                      v
-                        Conditional Windowing (Blackman / Rectangular-Tukey)
-                                      |
-                                      v
-                    TX/LISTEN Pulse Gating (0.02s period, 25% duty cycle)
-                                      |
-                                      v
-              Buffer(100) -> Unbuffer -> ZOH (5e-6s / 200kHz) -> DAC
-                                      |
-                                      v
-                    Analog Front End (MUX -> Filter -> Amplifier -> LC Match -> Transducer)
+Depth ADC ─────┼──> Decision Logic + Mod_Select Decision Block
+Temperature ───┘                    │
+                                    ▼
+                 Center Freq, T_pulse, Sound Velocity,
+                         Bandwidth, Mode (0/1/2)
+                                    │
+                                    ▼
+                       Modulation Selector
+                  ┌─────────────────────────────┐
+                  │ Mode 0: LFM Chirp           │
+                  │ Mode 1: Geometric Sweep     │
+                  │ Mode 2: Barker-13           │
+                  └─────────────────────────────┘
+                                    │
+                                    ▼
+                       Conditional Windowing
+                       (Blackman / Tukey)
+                                    │
+                                    ▼
+                       TX/LISTEN Pulse Gating
+                         (0.02 s, 25% duty)
+                                    │
+                                    ▼
+                        Buffer (100) → Unbuffer
+                                    │
+                                    ▼
+                         ZOH (5 μs / 200 kHz)
+                                    │
+                                    ▼
+                                  DAC
+                                    │
+                                    ▼
+                         3.3 V Analog Signal
+                                    │
+                                    ▼
+                         CD4051 Analog MUX
+                                    │
+                                    ▼
+                      Sallen-Key Active Filter
+                                    │
+                                    ▼
+                    LM318M + Class-AB Amplifier
+                              (~24 Vpp)
+                                    │
+                                    ▼
+                       LC Impedance Matching
+                                    │
+                                    ▼
+                      Piezoelectric Transducer
 ```
 
 ## 7. Repository Structure
@@ -115,20 +178,14 @@ sih-2026/
 | Project overview                                | `README.md`                                 |
 
 ## 8. Final Presentation
-
-See [submission/PRESENTATION.md](submission/PRESENTATION.md) for the presentation summary and link.
-
-If the PPT is too large for GitHub, use Google Drive/OneDrive and put the accessible viewer link in `submission/PRESENTATION.md`.
+[submission/PRESENTATION.md](submission/PRESENTATION.md)
 
 ## 9. Demo Video
-
-Add the YouTube/Google Drive demo link in [submission/DEMO.md](submission/DEMO.md).
+[submission/DEMO.md](submission/DEMO.md)
 
 ## 10. Screenshots / Prototype Photos
 
-Add Simulink model screenshots, scope captures, and hardware/prototype photos to:
-
-`assets/screenshots/`
+Simulink model screenshots, scope captures, and hardware/prototype photos to: `assets/screenshots/`
 
 See [assets/screenshots/README.md](assets/screenshots/README.md) for naming conventions.
 
@@ -141,6 +198,7 @@ pip install -r requirements.txt
 ```
 
 MATLAB/Simulink models require **MATLAB R2026a** with the **DSP System Toolbox** installed. Open `src/` and load the `.slx` model directly in Simulink.
+LTSpice 
 
 ## 12. Run
 
@@ -155,13 +213,10 @@ MATLAB/Simulink models require **MATLAB R2026a** with the **DSP System Toolbox**
 
 ## 13. Future Scope
 
-- Update the ZOH sample rate (currently 200 kHz) to at least 1.25 MHz+ to properly support the 500 kHz band without Nyquist violation
-- Confirm actual depth threshold values with the analog/hardware team (currently placeholder midpoints: 2.5 m / 17.5 m / 30 m)
-- Dynamic Voltage Scaling (DVS) via a digitally controlled DC-DC boost converter for extended battery life (~40% projected improvement)
-- Hysteresis / EMA filtering on turbidity and temperature sensing for robustness against thermocline effects and sensor noise in real ocean conditions
-- Migrate MCP4725 I2C DAC output to DMA + hardware-timer-driven streaming to remove I2C speed bottlenecks at high frequencies
-- Integrate the adaptive chirp signal into the full power-delivery Simscape model (buck converter reference input)
+- **Higher-Rate ZOH:** Increase the ZOH sample rate from 200 kHz to ≥1.25 MHz to support the 500 kHz operating band without Nyquist violation
+- **Ping-Pong Buffering:** Dual-buffer DMA scheme so the CPU synthesizes the next 100-sample frame while DMA transmits the current one, minimizing CPU active time with zero inter-frame latency/jitter (trade-off: doubles RAM footprint). Planned refinement: hardware-level automatic buffer-pointer swap on DMA interrupt.
+- **Fixed-Point DSP:** Replace floating-point calculations with Q15 arithmetic and SRAM lookup tables for faster, low-overhead waveform generation.
+- **ADC Hysteresis & Deadbanding (EMA filtering):** Smooths turbidity/temperature ADC reads so the system reacts to real environmental trends instead of chattering between modes around hard thresholds (e.g. 2.4V turbidity), at the cost of slight reaction lag. Planned refinement: bit-shifting EMA calculations instead of division to remove CPU overhead.
+- **Dynamic Voltage Scaling:** Dynamically adjust the amplifier supply from approximately 9 V to 24 V according to environmental conditions, with up to 40% projected battery-life improvement.
+- **High-Slew Analog Drive:** Use high-slew-rate op-amps with appropriate windowing to reliably support phase-coded waveforms such as Barker-13.
 
-## Important
-
-Before submission, make sure the repository is accessible to reviewers. Do **not** upload passwords, API keys, access tokens, `.env` files containing secrets, or other confidential credentials.
