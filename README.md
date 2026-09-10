@@ -56,6 +56,8 @@ Since the piezoelectric transducer behaves predominantly as a capacitive load, t
 5. Acoustic Transmission — Piezoelectric Transducer
 The matched high-voltage waveform is applied to the piezoelectric transducer, which converts the electrical excitation into mechanical vibration and generates the acoustic sonar pulse in water.
 
+This completes the transmitter-side signal chain, with the transducer converting the conditioned electrical waveform into the acoustic sonar pulse for underwater transmission.
+
 ## 4. Key Features
 
 - Real-time adaptive frequency band switching based on turbidity, depth, and temperature
