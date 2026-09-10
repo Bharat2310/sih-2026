@@ -1,17 +1,7 @@
 # Demo Video
 
-The demo video is **optional**, but strongly recommended if your project has a working prototype.
+The prototype demonstration video for Project Poseidon is available at the link below.
 
-## Demo video link
+## Demo Video Link
 
-`<PASTE_YOUTUBE_OR_GOOGLE_DRIVE_VIDEO_LINK_HERE>`
-
-## What the video should show
-
-1. Brief introduction to the problem.
-2. The proposed solution.
-3. Main features / workflow.
-4. Actual working prototype or final output.
-5. Hardware demonstration, if applicable.
-
-Keep the video focused on the actual project and make sure reviewers can access it without requesting permission.
+[Watch the Prototype Demo](https://drive.google.com/drive/folders/1Pm32NLZ3pSUcfD95rD-MbYwJ-gllIJSA)

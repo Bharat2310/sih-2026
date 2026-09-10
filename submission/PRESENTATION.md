@@ -1,20 +1,7 @@
 # Project Presentation
 
-Upload the **final SIH presentation (PPT/PPTX)** in this `submission/` folder and keep it with the project repository.
+The final SIH presentation for Project Poseidon is available at the link below.
 
-## Presentation file
+## Presentation File
 
-Replace the placeholder below with the actual file name once uploaded:
-
-- **PPT:** `[Open Final Presentation](./SIH2025-IDEA-Presentation-Format.pptx)`
-
-### Requirements
-
-- Upload only the final presentation.
-- Use a clear file name, for example `TeamName_SIH2026_Presentation.pptx`.
-- If the presentation is too large for GitHub, upload it to Google Drive/OneDrive and put the shareable viewer link below instead.
-- Test the link while logged out/incognito before submission.
-
-## External presentation link (only if needed)
-
-`<[https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8]>`
+[Open Final Presentation](https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8)
