@@ -180,8 +180,7 @@ sih-2026/
 
 ## 10. Screenshots / Prototype Photos
 
-Simulink model screenshots, waveform captures, decision-logic results and analog front-end/prototype images are available in: `assets/screenshots/`
-[assets/screenshots/README.md](assets/screenshots/README.md) 
+Simulink model screenshots, waveform captures, decision-logic results and analog front-end/prototype images are available in: [assets/screenshots/README.md](assets/screenshots/README.md) 
 
 ## 11. Installation
 
