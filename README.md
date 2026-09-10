@@ -73,7 +73,7 @@ This completes the transmitter-side signal chain, with the transducer converting
 
 - **Simulation / Signal Design:** MATLAB R2026a (Simulink, DSP System Toolbox), LTSpice 
 - **Embedded Firmware:** ESP32 (C, hardware timers, ISR-driven waveform synthesis, DMA)
-- **DAC (Phase 2 hardware):** MCP4725 (I2C)
+- **DAC (Phase 2 hardware):** MCP4921 (SPI)
 - **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318M / Class-AB power amplifier, LC impedance matching network
 - **Version Control:** Git / GitHub
 
