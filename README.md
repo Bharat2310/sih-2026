@@ -203,7 +203,7 @@ Prerequisites
   N=100; n=(0:N-1)'; w=0.42-0.5*cos(2*pi*n/(N-1))+0.08*cos(4*pi*n/(N-1));
   ```
 - **After-DAC analog front-end model:** Open `src/ltspice/after_dac_model.asc` in LTSpice and run.
-- **ESP32 firmware:** Open `src/esp32-firmware/` in Arduino IDE or PlatformIO, select the appropriate ESP32 board and port then compile and uplaod.
+- **ESP32 firmware:** Open `src/esp32-firmware/esp32-firmware.ino` in Arduino IDE or PlatformIO, select the appropriate ESP32 board and port then compile and uplaod.
   
 ## 13. Future Scope
 
