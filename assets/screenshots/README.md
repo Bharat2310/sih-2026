@@ -19,7 +19,3 @@ Project development and simulation results are documented through the following 
 
 * `after_dac_schematic.jpeg` — Analog signal-conditioning and amplification stage after DAC.
 * `after_dac_waveform.jpeg` — Resulting waveform after the analog front-end.
-
-### Project Assets
-
-Additional hardware and prototype photographs will be added as the physical implementation progresses.
