@@ -1,22 +1,17 @@
-# Final Presentation
+# Demo Video
 
-- **File:** `PS_XXXX_TeamName.pptx` _(add the actual file here or a link below)_
-- **Google Drive / OneDrive link (if too large for GitHub):** _(paste link here)_
+The demo video is **optional**, but strongly recommended if your project has a working prototype.
 
-## Summary
+## Demo video link
 
-- **Benefits** (technical/system-level advantages):
-  1. _(fill in — 6 points finalized in PPT)_
-  2.
-  3.
-  4.
-  5.
-  6.
+`<PASTE_YOUTUBE_OR_GOOGLE_DRIVE_VIDEO_LINK_HERE>`
 
-- **Impact** (real-world/mission-level outcomes):
-  1. _(fill in — 6 points finalized in PPT)_
-  2.
-  3.
-  4.
-  5.
-  6.
+## What the video should show
+
+1. Brief introduction to the problem.
+2. The proposed solution.
+3. Main features / workflow.
+4. Actual working prototype or final output.
+5. Hardware demonstration, if applicable.
+
+Keep the video focused on the actual project and make sure reviewers can access it without requesting permission.
