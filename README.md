@@ -173,7 +173,7 @@ sih-2026/
 
 ## 8. Final Presentation
 
-[View the Final Presentation](submission/PRESENTATION.md)
+[View the Final Presentation](submission/SIH2026_PROJECT_POSEIDON.pptx)
 
 ## 9. Demo Video
 
