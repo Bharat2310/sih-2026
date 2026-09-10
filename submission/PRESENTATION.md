@@ -1,17 +1,20 @@
-# Demo Video
+# Project Presentation
 
-The demo video is **optional**, but strongly recommended if your project has a working prototype.
+Upload the **final SIH presentation (PPT/PPTX)** in this `submission/` folder and keep it with the project repository.
 
-## Demo video link
+## Presentation file
 
-`<PASTE_YOUTUBE_OR_GOOGLE_DRIVE_VIDEO_LINK_HERE>`
+Replace the placeholder below with the actual file name once uploaded:
 
-## What the video should show
+- **PPT:** `[Open Final Presentation](./YOUR_FINAL_PRESENTATION.pptx)`
 
-1. Brief introduction to the problem.
-2. The proposed solution.
-3. Main features / workflow.
-4. Actual working prototype or final output.
-5. Hardware demonstration, if applicable.
+### Requirements
 
-Keep the video focused on the actual project and make sure reviewers can access it without requesting permission.
+- Upload only the final presentation.
+- Use a clear file name, for example `TeamName_SIH2026_Presentation.pptx`.
+- If the presentation is too large for GitHub, upload it to Google Drive/OneDrive and put the shareable viewer link below instead.
+- Test the link while logged out/incognito before submission.
+
+## External presentation link (only if needed)
+
+`<PASTE_GOOGLE_DRIVE_OR_ONEDRIVE_VIEW_LINK_HERE>`
