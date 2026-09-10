@@ -60,20 +60,21 @@ This completes the transmitter-side signal chain, with the transducer converting
 
 ## 4. Key Features
 
-- Real-time adaptive frequency band switching based on turbidity, depth, and temperature
-- Fully automatic modulation mode selection (LFM chirp / geometric sweep / Barker-13) via the Mod_Select Decision Block — no manual mode input required
-- Continuous sound-velocity compensation (Mackenzie 1981 formula)
-- Constant 2 cm range resolution maintained across all operating bands
-- Time-shared TX/LISTEN pulse gating cycle (0.02s period, 25% duty — 5ms TX / 15ms LISTEN), Software-Defined Sonar architecture
-- Simulink-verified signal chain before embedded firmware porting, reducing hardware risk
-- DMA-driven ZOH output with CPU Light Sleep during transmission for power optimization
+- **Real-Time Environmental Adaptation:** Dynamically adapts waveform parameters using turbidity, depth, and temperature.
+- **Adaptive 100–500 kHz Operation:** Shifts frequency according to turbidity to reduce scattering.
+- **Consistent 2 cm Resolution:** Dynamically compensates bandwidth across operating frequencies.
+- **3-Mode Waveform Selection:** Automatically switches between LFM Chirp, Geometric Sweep, and Barker-13 Phase Coding.
+- **Temperature-Based Correction:** Continuously calculates acoustic velocity for accurate bandwidth control.
+- **Dual-Stage Signal Conditioning:** Combines digital windowing with dedicated analog filtering to reduce sidelobes, noise, and harmonics.
+- **DMA-Based Low-Power Operation:** Uses hardware-timed DMA waveform output with a 5 ms TX / 15 ms LISTEN cycle.
+- **Impedance-Matched Transducer Drive:**s Uses amplification and LC matching for efficient power transfer to the piezoelectric transducer.
 
 ## 5. Technology Stack
 
 - **Simulation / Signal Design:** MATLAB R2026a (Simulink, DSP System Toolbox), LTSpice 
 - **Embedded Firmware:** ESP32 (C, hardware timers, ISR-driven waveform synthesis, DMA)
-- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318M / Class-AB power amplifier, LC impedance matching network
 - **DAC (Phase 2 hardware):** MCP4725 (I2C)
+- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318M / Class-AB power amplifier, LC impedance matching network
 - **Version Control:** Git / GitHub
 
 ## 6. Architecture
@@ -214,10 +215,10 @@ LTSpice
 
 ## 13. Future Scope
 
-- Update the ZOH sample rate (currently 200 kHz) to at least 1.25 MHz+ to properly support the 500 kHz band without Nyquist violation
-- Confirm actual depth threshold values with the analog/hardware team (currently placeholder midpoints: 2.5 m / 17.5 m / 30 m)
+- **Higher-Rate ZOH:** Increase the ZOH sample rate from 200 kHz to ≥1.25 MHz to support the 500 kHz operating band without Nyquist violation
 - **Ping-Pong Buffering:** Dual-buffer DMA scheme so the CPU synthesizes the next 100-sample frame while DMA transmits the current one, minimizing CPU active time with zero inter-frame latency/jitter (trade-off: doubles RAM footprint). Planned refinement: hardware-level automatic buffer-pointer swap on DMA interrupt.
+- **Fixed-Point DSP:** Replace floating-point calculations with Q15 arithmetic and SRAM lookup tables for faster, low-overhead waveform generation.
 - **ADC Hysteresis & Deadbanding (EMA filtering):** Smooths turbidity/temperature ADC reads so the system reacts to real environmental trends instead of chattering between modes around hard thresholds (e.g. 2.4V turbidity), at the cost of slight reaction lag. Planned refinement: bit-shifting EMA calculations instead of division to remove CPU overhead.
-- Dynamic Voltage Scaling (DVS) via a digitally controlled DC-DC boost converter for extended battery life (~40% projected improvement)
-- Migrate MCP4725 I2C DAC output to DMA + hardware-timer-driven streaming to remove I2C speed bottlenecks at high frequencies
-- Integrate the adaptive chirp signal into the full power-delivery Simscape model (buck converter reference input)
+- **Dynamic Voltage Scaling:** Dynamically adjust the amplifier supply from approximately 9 V to 24 V according to environmental conditions, with up to 40% projected battery-life improvement.
+- **High-Slew Analog Drive:** Use high-slew-rate op-amps with appropriate windowing to reliably support phase-coded waveforms such as Barker-13.
+
