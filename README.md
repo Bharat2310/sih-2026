@@ -204,7 +204,7 @@ Prerequisites
   ```
 - **After-DAC analog front-end model:** Open `src/ltspice/after_dac_model.asc` in LTSpice and run.
 - **ESP32 firmware:** Open `src/esp32-firmware/` in Arduino IDE or PlatformIO, select the appropriate ESP32 board and port then compile and uplaod.
-- 
+  
 ## 13. Future Scope
 
 - **Higher-Rate ZOH:** Increase the ZOH sample rate from 200 kHz to ≥1.25 MHz to support the 500 kHz operating band without Nyquist violation
