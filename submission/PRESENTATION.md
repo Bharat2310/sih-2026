@@ -17,4 +17,4 @@ Replace the placeholder below with the actual file name once uploaded:
 
 ## External presentation link (only if needed)
 
-`<PASTE_GOOGLE_DRIVE_OR_ONEDRIVE_VIEW_LINK_HERE>`
+`<[PASTE_GOOGLE_DRIVE_OR_ONEDRIVE_VIEW_LINK_HERE](https://drive.google.com/drive/folders/1zmBgFPTCAAXTWL-006rdsWCegVSXkXH8)>`
