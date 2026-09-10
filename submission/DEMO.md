@@ -1,8 +1,17 @@
 # Demo Video
 
-- **Link:** _(paste YouTube/Google Drive demo video link here)_
+The demo video is **optional**, but strongly recommended if your project has a working prototype.
 
-## What the demo shows
+## Demo video link
 
-- Simulink transmit pipeline running end-to-end (Decision Logic -> Modulation Selector -> Windowing -> TX/LISTEN gating -> DAC output)
-- _(add hardware demo details once Phase 2 is complete)_
+`<PASTE_YOUTUBE_OR_GOOGLE_DRIVE_VIDEO_LINK_HERE>`
+
+## What the video should show
+
+1. Brief introduction to the problem.
+2. The proposed solution.
+3. Main features / workflow.
+4. Actual working prototype or final output.
+5. Hardware demonstration, if applicable.
+
+Keep the video focused on the actual project and make sure reviewers can access it without requesting permission.

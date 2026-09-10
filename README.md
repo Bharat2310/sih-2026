@@ -138,79 +138,73 @@ Temperature ───┘                    │
 ```
 sih-2026/
 ├── README.md
-├── SUBMISSION_GUIDE.md
 ├── submission/
 │   ├── PRESENTATION.md      # link to final PPT
 │   └── DEMO.md              # link to prototype demo video
 ├── src/
 │   ├── simulink/
-│   │   ├── before_dac_model.slx     # Team A - digital chirp pipeline (Decision Logic -> ... -> ZOH -> DAC)
-│   │   └── after_dac_model.slx      # Team B - analog front-end Simscape model (MUX -> Filter -> Amp -> LC Match)
-│   └── esp32-firmware/
-│       └── (ESP32 .ino / .c / .h source files)
+│   │   └── before_dac_model.slx     # digital pipeline (Decision Logic -> ... -> ZOH -> DAC)
+│   ├── esp32-firmware/
+│   │   └── esp32-firmware.ino       # ESP32 firmware (tested build)
+│   └── ltspice/
+│       ├── after_dac_model.asc      # analog front-end circuit (after DAC)
+│       └── working_analog.asc       # working analog reference circuit
 ├── docs/
 │   └── architecture.md
 ├── assets/
 │   └── screenshots/
-│       ├── before-dac-result.png    # Team A simulation result screenshot
-│       ├── after-dac-result.png     # Team B simulation result screenshot
+        ├── after_dac_schematic.jpeg
+│       ├── after_dac_waveform.jpeg
+│       ├── before_dac_full_pipeline.png
+│       ├── decision_logic.jpeg
+│       ├── mod_select_decision.jpeg
+│       ├── modulation_selector.jpeg
+│       ├── mode0_lfm_final.jpeg
+│       ├── mode0_lfm_raw.jpeg
+│       ├── mode1_geometricalsweep_final.jpeg
+│       ├── mode1_geometricalsweep_raw.jpeg
+│       ├── mode2_phasecoded_final.jpeg
+│       └── mode2_phasecoded_raw.jpeg
 │       └── README.md
-├── auv-backend/          # existing backend code
-├── sih_tech_frontend/    # existing frontend code
-├── requirements.txt
 ├── .gitignore
 └── LICENSE
 ```
 
-### What goes where?
-
-| Item                                          | Location                                |
-| ------------------------------------------------ | ------------------------------------------ |
-| Simulink model - before DAC (Team A)            | `src/simulink/before_dac_model.slx`         |
-| Simulink/Simscape model - after DAC (Team B)    | `src/simulink/after_dac_model.slx`          |
-| ESP32 firmware                                  | `src/esp32-firmware/`                       |
-| Backend code                                    | `auv-backend/`                              |
-| Frontend / dashboard code                       | `sih_tech_frontend/`                        |
-| Architecture / technical documentation          | `docs/`                                     |
-| Screenshots of both models' results             | `assets/screenshots/`                       |
-| Final PPT link                                  | `submission/PRESENTATION.md`                |
-| Prototype demo video link                       | `submission/DEMO.md`                        |
-| Project overview                                | `README.md`                                 |
-
 ## 8. Final Presentation
-[submission/PRESENTATION.md](submission/PRESENTATION.md)
+
+[View the Final Presentation](submission/PRESENTATION.md)
 
 ## 9. Demo Video
-[submission/DEMO.md](submission/DEMO.md)
+
+[View the Prototype Demo](submission/DEMO.md)
 
 ## 10. Screenshots / Prototype Photos
 
-Simulink model screenshots, scope captures, and hardware/prototype photos to: `assets/screenshots/`
-
-See [assets/screenshots/README.md](assets/screenshots/README.md) for naming conventions.
+Simulink model screenshots, waveform captures, decision-logic results and analog front-end/prototype images are available in: [assets/screenshots/README.md](assets/screenshots/README.md) 
 
 ## 11. Installation
 
+Clone the repository and install the required dependencies:
 ```
-git clone <YOUR_REPOSITORY_URL>
+bash
+git clone https://github.com/Bharat2310/sih-2026.git
 cd sih-2026
-pip install -r requirements.txt
 ```
 
-MATLAB/Simulink models require **MATLAB R2026a** with the **DSP System Toolbox** installed. Open `src/` and load the `.slx` model directly in Simulink.
-LTSpice 
+Prerequisites
+1. MATLAB R2026a with Simulink and DSP System Toolbox
+2. LTspice
+3. Arduino IDE or PlatformIO for ESP32 firmware
 
 ## 12. Run
 
-- **Before-DAC Simulink model (Team A):** Open `src/simulink/before_dac_model.slx` in MATLAB R2026a and run. Remember to redefine the Blackman window variable in the Command Window after every MATLAB restart:
+- **Before-DAC Simulink model:** Open `src/simulink/before_dac_model.slx` in MATLAB R2026a and run. Remember to redefine the Blackman window variable in the Command Window after every MATLAB restart:
   ```matlab
   N=100; n=(0:N-1)'; w=0.42-0.5*cos(2*pi*n/(N-1))+0.08*cos(4*pi*n/(N-1));
   ```
-- **After-DAC analog front-end model (Team B):** Open `src/simulink/after_dac_model.slx` in MATLAB R2026a (Simscape) and run.
-- **ESP32 firmware:** Flash `src/esp32-firmware/` to the ESP32 board using the Arduino IDE or PlatformIO.
-- **Backend:** see `auv-backend/README.md` (or its own run instructions) for setup.
-- **Frontend:** see `sih_tech_frontend/README.md` (or its own run instructions) for setup.
-
+- **After-DAC analog front-end model:** Open `src/ltspice/after_dac_model.asc` in LTSpice and run.
+- **ESP32 firmware:** Open `src/esp32-firmware/esp32-firmware.ino` in Arduino IDE or PlatformIO, select the appropriate ESP32 board and port then compile and uplaod.
+  
 ## 13. Future Scope
 
 - **Higher-Rate ZOH:** Increase the ZOH sample rate from 200 kHz to ≥1.25 MHz to support the 500 kHz operating band without Nyquist violation
