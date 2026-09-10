@@ -1,28 +1,74 @@
-# Submission Guide
+# SIH 2026 Submission Guide
 
-This guide explains how to finalize this repository before submitting the GitHub link for SIH 2026.
+Use this checklist before sharing your GitHub repository link.
 
-## Checklist
+## Required repository content
 
-- [ ] `README.md` filled with accurate project title, PS ID, PS title, category, and theme
-- [ ] Problem statement and proposed solution sections reflect the final version presented to evaluators
-- [ ] Architecture diagram in `docs/architecture.md` matches the final Simulink pipeline and hardware block diagram
-- [ ] `src/` contains the final Simulink model(s) and ESP32 firmware source (not intermediate/debug versions)
-- [ ] `auv-backend/` and `sih_tech_frontend/` are up to date and runnable
-- [ ] Screenshots of the Simulink model, key scope outputs, and hardware/prototype photos added to `assets/screenshots/`
-- [ ] `submission/PRESENTATION.md` updated with the final PPT or an accessible viewer link
-- [ ] `submission/DEMO.md` updated with the demo video link (if available)
-- [ ] `requirements.txt` reflects actual Python dependencies used in `auv-backend/`
-- [ ] No API keys, tokens, passwords, or `.env` secrets committed anywhere in the repo
-- [ ] Repository visibility is set to **Public** (or otherwise accessible to reviewers)
-- [ ] All team members are added as collaborators (optional, but recommended)
+- Actual source code is present.
+- `README.md` explains the project clearly.
+- PS ID and PS title are included.
+- Problem statement and proposed solution are explained.
+- Key features are listed.
+- Technology stack is listed.
+- Setup and run instructions work.
+- Team members and roles are mentioned.
+- Important screenshots or hardware/prototype photos are included.
+- Final PPT/presentation is placed in `submission/` whenever practical.
+- If the PPT is too large for GitHub, an accessible Google Drive/OneDrive viewer link is added to `submission/PRESENTATION.md`.
+- Demo video link is added to `submission/DEMO.md` if available. This is optional.
+- Repository is accessible to reviewers.
 
-## Notes for This Project
+## Recommended structure
 
-- Team A (Simulink + ESP32 firmware) and Team B (analog circuits + KiCad schematics) each own separate parts of `src/` — keep folders clearly separated (e.g. `src/simulink/`, `src/esp32-firmware/`, `src/kicad/`) to avoid overwriting each other's work.
-- Flag any placeholder values (e.g. depth thresholds) clearly in `docs/architecture.md` so evaluators understand what is confirmed vs. pending.
-- Keep the Benefits list and Impact list in the presentation clearly separated, as finalized in the PPT.
+```text
+YOUR-SIH-PROJECT/
+├── README.md
+├── SUBMISSION_GUIDE.md
+├── submission/
+│   ├── PRESENTATION.md
+│   └── DEMO.md
+├── src/
+├── docs/
+├── assets/
+│   └── screenshots/
+└── ...
+```
 
-## Final Check
+## Presentation
 
-Before submitting, open the repository in an incognito/private browser window (logged out of GitHub) to confirm reviewers without special access can view everything.
+Upload the final PPT/PPTX to the `submission/` folder when the file size is suitable for GitHub. Use a clear filename such as:
+
+`TeamName_SIH2026_Presentation.pptx`
+
+If the PPT is too large, use Google Drive or OneDrive and put the shareable viewer link in `submission/PRESENTATION.md`.
+
+## Demo video
+
+The demo video is optional. If you have one, add its YouTube/Google Drive link to `submission/DEMO.md` and make sure it is accessible without requesting permission.
+
+## Screenshots / hardware photos
+
+Put important screenshots and prototype photos in `assets/screenshots/`. Include the most useful screens/results rather than random development screenshots.
+
+## Do not upload
+
+- Passwords
+- API keys
+- Access tokens
+- `.env` files containing secrets
+- Private credentials
+- Other confidential information
+
+## README should answer
+
+1. What problem are you solving?
+2. What is your proposed solution?
+3. How does it work?
+4. Which technologies did you use?
+5. How can a reviewer run it?
+6. What does the final output look like?
+7. What are the important features and expected impact?
+
+## Before submission
+
+Open your repository in a private/incognito browser window or while logged out and verify that the reviewer can access the code, PPT, screenshots, documentation and any submitted links that are supposed to be public.
