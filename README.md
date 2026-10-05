@@ -49,8 +49,8 @@ Analog chain:
 The CD4051 MUX routes the waveform to one of three dedicated Clear, Murky, or Muddy filter paths based on the environmental condition provided by the ESP32.
 2. Signal Conditioning: LT1058 Filter
 The selected path uses an LT1058 Sallen-Key 2nd-order Butterworth low-pass filter with a condition-specific cutoff frequency. It removes unwanted high-frequency switching noise and harmonics, producing a cleaner ~3.3 V waveform.
-3. Power Amplification: LM318M + Class-AB Stage
-The filtered signal is amplified using an LM318M driver with a 7.2× feedback gain, followed by a Class-AB BD139/BD140 push-pull stage powered from 18 V rails. This provides the high-voltage, high-current drive required by the transducer, targeting approximately 24 Vpp output.
+3. Power Amplification: LM318N + Class-AB Stage
+The filtered signal is amplified using an LM318N driver with a 7.2× feedback gain, followed by a Class-AB BD139/BD140 push-pull stage powered from 18 V rails. This provides the high-voltage, high-current drive required by the transducer, targeting approximately 24 Vpp output.
 4. Impedance Matching: LC Network
 Since the piezoelectric transducer behaves predominantly as a capacitive load, the LC network uses an inductive component to compensate for its capacitive reactance, improve electrical resonance, and enable more efficient power transfer.
 5. Acoustic Transmission: Piezoelectric Transducer
@@ -74,7 +74,7 @@ This completes the transmitter-side signal chain, with the transducer converting
 - **Simulation / Signal Design:** MATLAB R2026a (Simulink, DSP System Toolbox), LTSpice 
 - **Embedded Firmware:** ESP32 (C, hardware timers, ISR-driven waveform synthesis, DMA)
 - **DAC (Phase 2 hardware):** MCP4921 (SPI)
-- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318M / Class-AB power amplifier, LC impedance matching network
+- **Analog Front End:** CD4051 analog MUX, LT1058 Sallen-Key active filters, LM318N / Class-AB power amplifier, LC impedance matching network
 - **Version Control:** Git / GitHub
 
 ## 6. Architecture
@@ -123,7 +123,7 @@ Temperature ───┘                    │
                       Sallen-Key Active Filter
                                     │
                                     ▼
-                    LM318M + Class-AB Amplifier
+                    LM318N + Class-AB Amplifier
                               (~24 Vpp)
                                     │
                                     ▼
